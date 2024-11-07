@@ -3159,4 +3159,197 @@ end
 	end
 return WindowAlc
 end
+
+local UIStroke = Instance.new("UIStroke")
+
+	UIStroke.Color = Color3.fromRGB(37, 37, 37)
+	UIStroke.Parent = CloseUI
+
+	local dragToggle = nil
+	local dragSpeed = 0.1
+	local dragStart = nil
+	local startPos = nil
+	local valUI = true
+
+	Frame:GetPropertyChangedSignal('Size'):Connect(function()
+		if Frame.Size.X.Scale <= 0 then
+			Frame.Visible = false
+		else
+			Frame.Visible = true
+		end
+	end)
+
+	CloseUI:GetPropertyChangedSignal('Size'):Connect(function()
+		if CloseUI.Size.X.Scale <= 0 then
+			CloseUI.Visible = false
+		else
+			CloseUI.Visible = true
+		end
+	end)
+
+	local function ToggleUI(val)
+		if val then
+			TweenService:Create(Frame,TweenInfo.new(0.5),{Size = Alc.Config["UI Size"]}):Play()
+			TweenService:Create(CloseUI,TweenInfo.new(1,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Size = UDim2.fromScale(0,0)}):Play()
+		else
+			TweenService:Create(Frame,TweenInfo.new(1,Enum.EasingStyle.Quint,Enum.EasingDirection.In),{Size = UDim2.fromScale(0,0)}):Play()
+			TweenService:Create(CloseUI,TweenInfo.new(0.5),{Size = UDim2.fromScale(1,1)}):Play()
+		end
+	end
+
+		task.spawn(function()
+			local Toggle = Instance.new("ScreenGui")
+			local Frames = Instance.new("Frame")
+			local UICorner = Instance.new("UICorner")
+			local UIStroke = Instance.new("UIStroke")
+			local logo = Instance.new("ImageLabel")
+			local DropShadow = Instance.new("ImageLabel")
+
+			Toggle.Name = "Toggle"
+			Toggle.Parent = Alc.CoreGui or game.Players.LocalPlayer:WaitForChild("PlayerGui")
+			Toggle.ZIndexBehavior = Enum.ZIndexBehavior.Global
+
+			Frames.Name = 'c4'
+			Frames.Parent = Toggle
+			Frames.AnchorPoint = Vector2.new(0.5, 0.5)
+			Frames.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+			Frames.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			Frames.BorderSizePixel = 0
+			Frames.Position = UDim2.new(0.120833337, 0, 0.0952890813, 0)
+			Frames.Size = UDim2.new(0, 65, 0, 65)
+			Frames.SizeConstraint = Enum.SizeConstraint.RelativeYY
+			Frames.ZIndex = 67
+
+			UICorner.Parent = Frames
+
+			UIStroke.Color = Color3.fromRGB(121, 121, 121)
+			UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+			UIStroke.Parent = Frames
+
+			logo.Name = "logo"
+			logo.Parent = Frames
+			logo.AnchorPoint = Vector2.new(0.5, 0.5)
+			logo.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+			logo.BackgroundTransparency = 1.010
+			logo.BorderColor3 = Color3.fromRGB(0, 0, 0)
+			logo.BorderSizePixel = 0
+			logo.Position = UDim2.new(0.5, 0, 0.5, 0)
+			logo.Size = UDim2.new(0.899999976, 0, 0.899999976, 0)
+			logo.ZIndex = 68
+			logo.Image = WindowLogo
+
+			DropShadow.Name = "DropShadow"
+			DropShadow.Parent = Frames
+			DropShadow.AnchorPoint = Vector2.new(0.5, 0.5)
+			DropShadow.BackgroundTransparency = 1.000
+			DropShadow.BorderSizePixel = 0
+			DropShadow.Position = UDim2.new(0.5, 0, 0.5, 0)
+			DropShadow.Size = UDim2.new(1, 47, 1, 47)
+			DropShadow.ZIndex = 66
+			DropShadow.Image = "rbxassetid://6015897843"
+			DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+			DropShadow.ImageTransparency = 0.500
+			DropShadow.ScaleType = Enum.ScaleType.Slice
+			DropShadow.SliceCenter = Rect.new(49, 49, 450, 450)
+
+			local dragToggle = false
+			local dragStart = nil
+			local startPos = nil
+
+			local old = Frames.Position
+			local function dInput(input)
+				local delta = input.Position - dragStart
+				local position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+					startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+				game:GetService('TweenService'):Create(Frames, TweenInfo.new(dragSpeed), {Position = position}):Play()
+			end
+
+			local but = cretate_button(Frames)
+			but.ZIndex = 68
+			but.MouseButton1Click:Connect(function()
+				if old == Frames.Position then
+					valUI = not valUI
+					ToggleUI(valUI)
+				end
+			end)
+			but.InputBegan:Connect(function(input)
+				if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then 
+					dragToggle = true
+					dragStart = input.Position
+					startPos = Frames.Position
+					old = Frames.Position
+					input.Changed:Connect(function()
+						if input.UserInputState == Enum.UserInputState.End then
+							dragToggle = false
+						end
+					end)
+				end
+			end)
+
+
+
+			UserInputService.InputChanged:Connect(function(input)
+				if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+					if dragToggle then
+						dInput(input)
+					end
+				end
+			end)
+		end)
+	
+
+	
+	UIS.InputBegan:Connect(function(io, p)
+		if io.KeyCode == UIConfig.Bind then
+			if uitoggled == false then
+				Frame:TweenSize(UDim2.new(0, 0, 0, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 1, true)
+				uitoggled = true;
+				task.wait(.5)
+				Main.Enabled = false
+			else
+				Frame:TweenSize(UDim2.new(0.100000001, 410, 0.100000001, 240), Enum.EasingDirection.Out, Enum.EasingStyle.Quart, 1, true)
+				Main.Enabled = true;
+				uitoggled = false
+			end
+		end
+	end)
+
+	local function updateInput(input)
+		local delta = input.Position - dragStart
+		local position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
+			startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+		game:GetService('TweenService'):Create(Frame, TweenInfo.new(dragSpeed), {Position = position}):Play()
+	end
+
+	Topbar.InputBegan:Connect(function(input)
+		if (input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch) then 
+			dragToggle = true
+			dragStart = input.Position
+			startPos = Frame.Position
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragToggle = false
+				end
+			end)
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+			if dragToggle then
+				updateInput(input)
+			end
+		end
+	end)
+
+	UserInputService.InputBegan:Connect(function(input,ty)
+		if ty then
+			return
+		end
+
+		if input.KeyCode == WindowAlc.Toggle then
+			valUI = not valUI
+			ToggleUI(valUI)
+		end
+	end)
 return Alc
